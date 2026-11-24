@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es" data-color-mode="random">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IA Bros</title>
+<meta name="description" content="IA para video, producción y broadcast.">
+<meta name="theme-color" content="#64FF28">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="css/tokens.css?v=2311e">
+<link rel="stylesheet" href="css/base.css?v=2311e">
+<link rel="stylesheet" href="css/components.css?v=2311e">
+<link rel="stylesheet" href="css/sections.css?v=2311e">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">Saltar al contenido</a>
+
+<!-- ============ HEADER ============ -->
+<header class="top" id="top">
+  <a class="logo" href="#hero" aria-label="IA Bros">
+    <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="28"/><rect x="18" y="2" width="12" height="12"/><rect x="18" y="18" width="12" height="12" class="logo__px"/></svg>
+    <span class="logo__word">IA&nbsp;BROS</span>
+  </a>
+  <nav class="top__nav" aria-label="Principal">
+    <a href="#trabajos" data-i18n="nav.work">Trabajos</a>
+    <a href="#servicios" data-i18n="nav.services">Servicios</a>
+    <a href="#herramientas" data-i18n="nav.tools">Herramientas</a>
+    <a href="#motor" data-i18n="nav.engine">Motor</a>
+    <a href="#proceso" data-i18n="nav.process">Proceso</a>
+    <a href="#equipo" data-i18n="nav.team">Equipo</a>
+  </nav>
+  <div class="top__right">
+    <div class="langs langs--top" role="group" aria-label="Idioma · Language · 语言">
+      <button type="button" data-lang="es" lang="es">ES</button>
+      <button type="button" data-lang="en" lang="en">EN</button>
+      <button type="button" data-lang="zh-Hans" lang="zh-Hans">简体</button>
+      <button type="button" data-lang="zh-Hant" lang="zh-Hant">繁體</button>
+    </div>
+    <a class="btn btn--ink top__cta" href="#contacto" data-i18n="nav.cta">Hablemos</a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="menu">
+      <span class="sr" data-i18n="nav.menu">Menú</span><i></i><i></i>
+    </button>
+  </div>
+</header>
+
+<div class="menu" id="menu" hidden>
+  <div class="langs langs--menu" role="group" aria-label="Idioma · Language · 语言">
+    <button type="button" data-lang="es" lang="es">ES</button>
+    <button type="button" data-lang="en" lang="en">EN</button>
+    <button type="button" data-lang="zh-Hans" lang="zh-Hans">简体</button>
+    <button type="button" data-lang="zh-Hant" lang="zh-Hant">繁體</button>
+  </div>
+  <nav aria-label="Móvil">
+    <a href="#trabajos" data-i18n="nav.work">Trabajos</a>
+    <a href="#servicios" data-i18n="nav.services">Servicios</a>
+    <a href="#herramientas" data-i18n="nav.tools">Herramientas</a>
+    <a href="#motor" data-i18n="nav.engine">Motor</a>
+    <a href="#proceso" data-i18n="nav.process">Proceso</a>
+    <a href="#equipo" data-i18n="nav.team">Equipo</a>
+    <a href="#contacto" data-i18n="nav.cta">Hablemos</a>
+  </nav>
+</div>
+
+<main id="main">
+
+<!-- ============ HERO: denoise ============ -->
+<section class="hero" id="hero">
+  <p class="hero__kicker" data-i18n="hero.kicker">IA para video, producción y broadcast · Santiago de Chile</p>
+  <div class="hero__stage">
+    <canvas class="hero__canvas" id="denoise" aria-hidden="true"></canvas>
+  </div>
+  <div class="hero__meta">
+    <button class="hero__regen" type="button" id="regen"><span aria-hidden="true">↻</span> <span data-i18n="hero.regen">Regenerar</span></button>
+    <div class="hero__readout" aria-hidden="true">
+      <span>step <b id="dn-step">00</b>/24</span>
+      <span>seed <b id="dn-seed">0420</b></span>
+      <span>cfg 7.0</span>
+    </div>
+  </div>
+  <div class="hero__foot">
+    <h1 class="hero__title"><span data-i18n="hero.line1">Venimos del control.</span> <span data-i18n="hero.line2">Vamos a la IA.</span></h1>
+    <div class="hero__side">
+      <p data-i18n="hero.body">Somos gente de broadcast, animación y publicidad…</p>
+      <div class="hero__ctas">
+        <a class="btn btn--ink" href="#contacto" data-i18n="hero.cta1">Cuéntanos tu proyecto</a>
+        <a class="btn btn--line" href="#trabajos" data-i18n="hero.cta2">Ver trabajos</a>
+      </div>
+    </div>
+  </div>
+  <div class="stack">
+    <p class="stack__lbl" id="stack-lbl" data-i18n="hero.stack">Trabajamos con</p>
+    <ul class="stack__list" id="stack" aria-labelledby="stack-lbl"></ul>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee" aria-hidden="true"><div class="marquee__track" id="marquee"></div></div>
+
+<!-- ============ TRABAJOS: ya renderizado (rundown + monitor PGM) ============ -->
+<section class="work band" id="trabajos" aria-labelledby="wk-title">
+  <div class="head">
+    <h2 class="h2" id="wk-title" data-i18n="work.title">Ya renderizado</h2>
+    <p class="head__intro" data-i18n="work.intro"></p>
+  </div>
+  <div class="wk__filters" id="wk-filters" role="group" aria-labelledby="wk-title"></div>
+  <div class="rd">
+    <div class="rd__pgm">
+      <div class="rd__mon">
+        <canvas class="rd__canvas" id="wk-canvas" aria-hidden="true"></canvas>
+        <div class="rd__media" id="wk-media"></div>
+        <span class="rd__tag" aria-hidden="true">PGM</span>
+        <span class="rd__tc" id="wk-tc" aria-hidden="true"></span>
+      </div>
+      <div class="rd__info" id="wk-info" aria-live="polite"></div>
+    </div>
+    <ol class="rd__list" id="wk-list"></ol>
+  </div>
+  <p class="rd__note" data-i18n="work.note"></p>
+</section>
+
+<!-- ============ SERVICIOS ============ -->
+<section class="services band" id="servicios" aria-labelledby="sv-title">
+  <div class="head">
+    <h2 class="h2" id="sv-title" data-i18n="services.title">Lo que ponemos al aire</h2>
+    <p class="head__intro" data-i18n="services.intro"></p>
+  </div>
+  <ul class="acc" id="services-list"></ul>
+</section>
+
+<!-- ============ MANIFESTO ============ -->
+<section class="manifesto band" aria-labelledby="mf-title">
+  <h2 class="sr" id="mf-title" data-i18n="manifesto.label">Quiénes somos</h2>
+  <p class="manifesto__text" data-i18n-html="manifesto.text"></p>
+  <p class="manifesto__body" data-i18n="manifesto.body"></p>
+</section>
+
+<!-- ============ HERRAMIENTAS: multiviewer ============ -->
+<section class="tools band" id="herramientas" aria-labelledby="tl-title">
+  <div class="head">
+    <h2 class="h2" id="tl-title" data-i18n="tools.title">Software propio</h2>
+    <p class="head__intro" data-i18n="tools.intro"></p>
+  </div>
+  <div class="mv" id="mv" role="group" aria-labelledby="tl-title"></div>
+  <div class="mv__detail" id="mv-detail" aria-live="polite"></div>
+</section>
+
+<!-- ============ MOTOR: node graph ============ -->
+<section class="engine band" id="motor" aria-labelledby="en-title">
+  <div class="head">
+    <h2 class="h2" id="en-title" data-i18n="engine.title">IA local. Fierro propio.</h2>
+    <p class="head__intro" data-i18n="engine.body"></p>
+  </div>
+  <div class="graph" id="graph" role="group" aria-labelledby="en-title">
+    <div class="graph__bar">
+      <p class="graph__status" id="graph-status" aria-live="polite"></p>
+      <div class="graph__btns">
+        <button type="button" class="gbtn gbtn--main" id="graph-solve" data-i18n="engine.solve">Armar flujo</button>
+        <button type="button" class="gbtn" id="graph-shuffle" data-i18n="engine.shuffle">Desarmar</button>
+      </div>
+    </div>
+    <div class="graph__area" id="graph-area">
+      <svg class="graph__wires" id="wires" aria-hidden="true"></svg>
+      <div class="graph__nodes" id="nodes"></div>
+    </div>
+    <p class="graph__hint" data-i18n="engine.hint"></p>
+  </div>
+  <div class="rig">
+    <h3 class="rig__title" data-i18n="engine.hw">La máquina</h3>
+    <ul class="rig__list" id="rig"></ul>
+  </div>
+</section>
+
+<!-- ============ PROCESO: timeline ============ -->
+<section class="process band" id="proceso" aria-labelledby="pr-title">
+  <div class="head">
+    <h2 class="h2" id="pr-title" data-i18n="process.title">Solo necesitamos conocerte</h2>
+  </div>
+  <div class="tl__bar">
+    <p class="tl__status" id="tl-status" aria-live="polite"></p>
+    <button type="button" class="tl__fix" id="tl-fix" data-i18n="process.fix">Ordenar</button>
+  </div>
+  <div class="tl" id="tl">
+    <div class="tl__ruler" id="ruler" aria-hidden="true"></div>
+    <div class="tl__track tl__track--v"><span class="tl__lbl" aria-hidden="true">V1</span><div class="tl__clips" id="clips" role="group" aria-label="V1"></div></div>
+    <div class="tl__track tl__track--a" aria-hidden="true"><span class="tl__lbl">A1</span><div class="tl__wave" id="wave"></div></div>
+  </div>
+  <p class="tl__hint" data-i18n="process.hint"></p>
+  <ol class="steps" id="steps"></ol>
+</section>
+
+<!-- ============ EQUIPO: credenciales ============ -->
+<section class="team band" id="equipo" aria-labelledby="tm-title">
+  <div class="head">
+    <h2 class="h2" id="tm-title" data-i18n="team.title">Los bros</h2>
+    <p class="head__intro" data-i18n="team.intro"></p>
+  </div>
+  <ul class="passes" id="passes"></ul>
+</section>
+
+<!-- ============ CONTACTO ============ -->
+<section class="contact band" id="contacto" aria-labelledby="ct-title">
+  <h2 class="contact__title" id="ct-title" data-i18n="contact.title">¿Qué quieres poner al aire?</h2>
+  <div class="contact__row">
+    <p class="contact__body" data-i18n="contact.body"></p>
+    <div class="contact__links">
+      <a class="btn btn--ink btn--xl" href="mailto:hola@iabros.cl">hola@iabros.cl</a>
+      <a class="btn btn--line btn--xl" href="https://wa.me/56900000000">WhatsApp +56 9 0000 0000</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <span>IA BROS</span>
+  <span data-i18n="footer.city">Santiago de Chile</span>
+  <span class="foot__tc" id="tc" aria-hidden="true">10:00:00:00</span>
+</footer>
+
+<!-- textos por idioma -->
+<script src="i18n/es.js?v=2311e"></script>
+<script src="i18n/en.js?v=2311e"></script>
+<script src="i18n/zh-hans.js?v=2311e"></script>
+<script src="i18n/zh-hant.js?v=2311e"></script>
+<!-- lógica -->
+<script src="js/i18n.js?v=2311e"></script>
+<script src="js/denoise.js?v=2311e"></script>
+<script src="js/sections.js?v=2311e"></script>
+<script src="js/graph.js?v=2311e"></script>
+<script src="js/faces.js?v=2311e"></script>
+<script src="js/float.js?v=2311e"></script>
+<script src="js/timeline.js?v=2311e"></script>
+<script src="data/work.js?v=2311e"></script>
+<script src="js/work.js?v=2311e"></script>
+<script src="js/theme.js?v=2311e"></script>
+<script src="js/main.js?v=2311e"></script>
+<script src="js/trail.js?v=2311e"></script>
+</body>
+</html>

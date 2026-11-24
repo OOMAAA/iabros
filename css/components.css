@@ -1,0 +1,102 @@
+/* componentes: header, botones, idiomas, menú móvil, marquee */
+
+/* ---------- botones ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 22px; border-radius: 999px;
+  font: 600 1rem/1 var(--f-body); text-decoration: none; white-space: nowrap;
+  border: 2px solid var(--ink); cursor: pointer;
+  transition: transform .25s var(--ease), background .25s, color .25s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn--ink { background: var(--ink); color: var(--acid); }
+.btn--ink:hover { background: var(--ink-2); color: var(--acid); }
+.btn--line { background: transparent; color: var(--ink); }
+.btn--line:hover { background: var(--ink); color: var(--paper); }
+.btn--xl { min-height: 60px; padding: 0 28px; font-size: 1.125rem; white-space: normal; text-align: center; }
+
+/* ---------- header ---------- */
+.top {
+  position: sticky; top: 0; z-index: 50;
+  height: var(--head-h); padding: 0 var(--gut);
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  background: var(--acid);
+  border-bottom: 2px solid var(--ink);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo__mark { width: 26px; height: 26px; fill: var(--ink); }
+.logo__px { animation: px 2.4s steps(1) infinite; }
+@keyframes px { 0%, 70% { opacity: 1; } 71%, 100% { opacity: 0; } }
+.logo__word { font: 900 1.35rem/1 var(--f-display); font-stretch: 150%; letter-spacing: -0.01em; }
+
+.top__nav { display: flex; gap: 4px; }
+.top__nav a {
+  padding: 10px 14px; border-radius: 999px; text-decoration: none; font-weight: 500;
+  transition: background .2s;
+}
+.top__nav a:hover { background: rgba(11, 11, 10, .1); }
+.top__right { display: flex; align-items: center; gap: 12px; }
+
+/* idiomas: segmentado tipo switcher de fuentes de una mesa */
+.langs { display: flex; padding: 3px; border: 2px solid var(--ink); border-radius: 999px; }
+.langs button {
+  min-width: 44px; min-height: 36px; padding: 0 10px; border: 0; border-radius: 999px;
+  background: transparent; cursor: pointer; font: 600 .8125rem/1 var(--f-body);
+}
+.langs button[aria-pressed="true"] { background: var(--ink); color: var(--acid); }
+.langs button:not([aria-pressed="true"]):hover { background: rgba(11, 11, 10, .1); }
+
+.burger { display: none; width: 44px; height: 44px; border: 2px solid var(--ink); border-radius: 50%; background: transparent; cursor: pointer; position: relative; }
+.burger i { position: absolute; left: 11px; right: 11px; height: 2px; background: var(--ink); transition: transform .3s var(--ease); }
+.burger i:nth-of-type(1) { top: 16px; }
+.burger i:nth-of-type(2) { top: 24px; }
+.burger[aria-expanded="true"] i:nth-of-type(1) { transform: translateY(4px) rotate(45deg); }
+.burger[aria-expanded="true"] i:nth-of-type(2) { transform: translateY(-4px) rotate(-45deg); }
+
+/* ---------- menú móvil ---------- */
+.menu { position: fixed; inset: var(--head-h) 0 0; z-index: 40; background: var(--acid); padding: 24px var(--gut); overflow: auto; }
+.menu { display: flex; flex-direction: column; }
+.menu[hidden] { display: none; }
+.menu nav { display: flex; flex-direction: column; }
+.menu a {
+  padding: 14px 0; border-bottom: 2px solid var(--ink); text-decoration: none;
+  font: 900 clamp(2rem, 9vw, 3rem)/1.05 var(--f-display); font-stretch: 130%;
+}
+
+@media (max-width: 1080px) { .top__nav { display: none; } .burger { display: block; } }
+/* idiomas dentro del menú móvil */
+.langs--menu { display: none; align-self: flex-start; margin-bottom: 18px; }
+.langs--menu button { min-height: 44px; min-width: 52px; font-size: .9375rem; }
+@media (max-width: 640px) {
+  .langs--top { display: none; }
+  .langs--menu { display: inline-flex; }
+  .top__cta { min-height: 40px; padding: 0 16px; font-size: .9375rem; }
+  .top__right { gap: 8px; }
+  .logo__word { font-size: 1.1rem; }
+}
+@media (max-width: 360px) { .logo__word { display: none; } }
+
+/* ---------- marquee ---------- */
+.marquee { background: var(--ink); color: var(--acid); overflow: hidden; border-block: 2px solid var(--ink); }
+.marquee__track {
+  display: flex; width: max-content; gap: 0;
+  animation: marquee 38s linear infinite;
+}
+.marquee__track span {
+  display: inline-flex; align-items: center; gap: 28px; padding: 18px 28px 18px 0;
+  font: 800 clamp(1.25rem, 2.4vw, 1.9rem)/1 var(--f-display); font-stretch: 140%; white-space: nowrap;
+}
+.marquee__track span::after { content: ""; width: 14px; height: 14px; background: var(--acid); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- glitch entre colores (modo random) ---------- */
+.glitch { position: fixed; inset: 0; z-index: 90; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
+html.glitching main { animation: jitter .75s steps(8) both; }
+@keyframes jitter {
+  0% { transform: none; } 15% { transform: translateX(-7px); } 30% { transform: translateX(5px) skewX(-1deg); }
+  45% { transform: translateX(-3px); } 60% { transform: translateX(9px); } 75% { transform: translateX(-4px) skewX(1deg); } 100% { transform: none; }
+}
+
+/* ---------- rastro de pixeles del mouse ---------- */
+.trail { position: fixed; inset: 0; z-index: 80; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
