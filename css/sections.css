@@ -31,7 +31,9 @@
   letter-spacing: -0.025em; text-wrap: balance;
 }
 .hero__title span { display: block; }
-.hero__title span + span { font-style: normal; -webkit-text-stroke: 2px var(--ink); color: transparent; }
+/* texto calado: el trazo va detrás y el relleno (color del fondo) tapa las uniones internas
+   de las letras, así no aparecen las líneas cruzadas (pasaba fuerte en chino) */
+.hero__title span + span { font-style: normal; color: var(--acid); -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; }
 .hero__side { display: grid; gap: 22px; }
 .hero__side p { font-size: 1.125rem; max-width: 48ch; }
 .hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; }
