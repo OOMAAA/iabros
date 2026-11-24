@@ -3,7 +3,7 @@
 (function () {
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var COLS = 48, BAR_ROWS = 10, FULL_ROWS = 48, FPS_MS = 70;
-  var state = [], raf = 0, last = 0;
+  var raf = 0, last = 0; /* el estado vive en cada foto (ph._fs): así no importa si las fichas cambian de orden */
 
   function rand(a, b) { return a + Math.random() * (b - a); }
 
@@ -38,7 +38,7 @@
     last = t;
     var acid = acidNow();
     photos().forEach(function (ph, i) {
-      var s = state[i], c = ph.querySelector(".pass__glitch");
+      var s = ph._fs, c = ph.querySelector(".pass__glitch");
       if (!s || !c) return;
       var bursting = t < s.burst;
       ph.classList.toggle("is-burst", bursting);
@@ -47,15 +47,12 @@
     });
   }
 
-  function set(i, clean) {
-    var s = state[i];
+  function set(ph, clean) {
+    var s = ph._fs;
     if (!s || s.clean === clean) return;
     s.clean = clean;
     s.burst = reduce ? 0 : performance.now() + 200;
-    if (reduce) {
-      var ph = photos()[i];
-      if (ph) ph.classList.toggle("is-clean", clean);
-    }
+    if (reduce) ph.classList.toggle("is-clean", clean);
   }
 
   function attach() {
@@ -69,10 +66,12 @@
         c.width = COLS; c.height = BAR_ROWS;
         ph.appendChild(c);
       }
-      if (!state[i]) state[i] = { clean: false, burst: 0 };
-      ph.classList.toggle("is-clean", state[i].clean);
+      if (!ph._fs) ph._fs = { clean: false, burst: 0 };
+      ph.classList.toggle("is-clean", ph._fs.clean);
       var pass = ph.closest(".pass");
-      var on = function () { set(i, true); }, off = function () { set(i, false); };
+      if (pass._faces) return draw(c, acid, false); /* listeners ya puestos */
+      pass._faces = true;
+      var on = function () { set(ph, true); }, off = function () { set(ph, false); };
       pass.addEventListener("pointerenter", on);
       pass.addEventListener("pointerleave", off);
       pass.addEventListener("focusin", on);
