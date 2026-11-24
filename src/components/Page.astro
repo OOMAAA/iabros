@@ -1,0 +1,266 @@
+---
+/* La página completa, prerenderizada por idioma (lo que ve Google y las vistas previas).
+   Las partes interactivas las vuelve a dibujar el JS de public/js con el mismo marcado. */
+import { I18N, TEAM, STACK, WORK, LOCALES, rich } from "../lib/data.mjs";
+
+const { lang } = Astro.props;
+const t = I18N[lang];
+const B = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+const ROT = [-2, 1.5, -1, 2.2];
+const CLIP_W = [22, 28, 32, 18];
+const tc = (s) => "00:00:" + String(s).padStart(2, "0") + ":00";
+const stepTc = CLIP_W.reduce((acc, w, i) => { acc.push(tc(Math.round(CLIP_W.slice(0, i).reduce((a, b) => a + b, 0) * 0.5))); return acc; }, []);
+const marquee = [...t.marquee, ...t.marquee];
+const workTypes = ["video", "3d", "web", "app", "impl"].filter((k) => WORK.some((w) => w.type === k));
+const w0 = WORK[0];
+const w0t = t.work.items[w0.id];
+const navItems = [["#trabajos", "work"], ["#servicios", "services"], ["#herramientas", "tools"], ["#motor", "engine"], ["#proceso", "process"], ["#equipo", "team"]];
+---
+<a class="skip" href="#main" data-i18n="nav.skip">{t.nav.skip}</a>
+
+<header class="top" id="top">
+  <a class="logo" href="#hero" aria-label="IA Bros">
+    <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="28"/><rect x="18" y="2" width="12" height="12"/><rect x="18" y="18" width="12" height="12" class="logo__px"/></svg>
+    <span class="logo__word">IA&nbsp;BROS</span>
+  </a>
+  <nav class="top__nav" aria-label={t.nav.menu}>
+    {navItems.map(([h, k]) => <a href={h} data-i18n={`nav.${k}`}>{t.nav[k]}</a>)}
+  </nav>
+  <div class="top__right">
+    <div class="langs langs--top" role="group" aria-label="Idioma · Language · 语言">
+      {LOCALES.map((l) => <a href={B + l.path} data-lang={l.code} lang={l.code} hreflang={l.code} aria-current={l.code === lang ? "page" : undefined} title={l.name}>{l.label}</a>)}
+    </div>
+    <a class="btn btn--ink top__cta" href="#contacto" data-i18n="nav.cta">{t.nav.cta}</a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="menu">
+      <span class="sr" data-i18n="nav.menu">{t.nav.menu}</span><i></i><i></i>
+    </button>
+  </div>
+</header>
+
+<div class="menu" id="menu" hidden>
+  <div class="langs langs--menu" role="group" aria-label="Idioma · Language · 语言">
+    {LOCALES.map((l) => <a href={B + l.path} data-lang={l.code} lang={l.code} hreflang={l.code} aria-current={l.code === lang ? "page" : undefined}>{l.label}</a>)}
+  </div>
+  <nav aria-label={t.nav.menu}>
+    {navItems.map(([h, k]) => <a href={h} data-i18n={`nav.${k}`}>{t.nav[k]}</a>)}
+    <a href="#contacto" data-i18n="nav.cta">{t.nav.cta}</a>
+  </nav>
+</div>
+
+<main id="main">
+
+<!-- HERO: el logotipo nace del ruido -->
+<section class="hero" id="hero">
+  <p class="hero__kicker" data-i18n="hero.kicker">{t.hero.kicker}</p>
+  <div class="hero__stage">
+    <canvas class="hero__canvas" id="denoise" aria-hidden="true"></canvas>
+  </div>
+  <div class="hero__meta">
+    <button class="hero__regen" type="button" id="regen"><span aria-hidden="true">↻</span> <span data-i18n="hero.regen">{t.hero.regen}</span></button>
+    <div class="hero__readout" aria-hidden="true">
+      <span>step <b id="dn-step">00</b>/24</span>
+      <span>seed <b id="dn-seed">0420</b></span>
+      <span>cfg 7.0</span>
+    </div>
+  </div>
+  <div class="hero__foot">
+    <h1 class="hero__title"><span data-i18n="hero.line1">{t.hero.line1}</span> <span data-i18n="hero.line2">{t.hero.line2}</span></h1>
+    <div class="hero__side">
+      <p data-i18n="hero.body">{t.hero.body}</p>
+      <div class="hero__ctas">
+        <a class="btn btn--ink" href="#contacto" data-i18n="hero.cta1">{t.hero.cta1}</a>
+        <a class="btn btn--line" href="#trabajos" data-i18n="hero.cta2">{t.hero.cta2}</a>
+      </div>
+    </div>
+  </div>
+  <div class="stack">
+    <p class="stack__lbl" id="stack-lbl" data-i18n="hero.stack">{t.hero.stack}</p>
+    <ul class="stack__list" id="stack" aria-labelledby="stack-lbl">
+      {STACK.map((s) => <li>{s.logo ? <img src={B + s.logo} alt={s.name} /> : s.name}</li>)}
+    </ul>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="marquee__track" id="marquee">{[...marquee, ...marquee].map((m) => <span>{m}</span>)}</div></div>
+
+<!-- TRABAJOS: rundown + monitor PGM -->
+<section class="work band" id="trabajos" aria-labelledby="wk-title">
+  <div class="head">
+    <h2 class="h2" id="wk-title" data-i18n="work.title">{t.work.title}</h2>
+    <p class="head__intro" data-i18n="work.intro">{t.work.intro}</p>
+  </div>
+  <div class="wk__filters" id="wk-filters" role="group" aria-labelledby="wk-title">
+    {["all", ...workTypes].map((k) => <button type="button" class="wk__f" data-f={k} aria-pressed={k === "all" ? "true" : "false"}>{t.work.filters[k]}</button>)}
+  </div>
+  <div class="rd">
+    <div class="rd__pgm">
+      <div class="rd__mon">
+        <canvas class="rd__canvas" id="wk-canvas" aria-hidden="true"></canvas>
+        <div class="rd__media" id="wk-media"></div>
+        <span class="rd__tag" aria-hidden="true">PGM</span>
+        <span class="rd__tc" id="wk-tc" aria-hidden="true"></span>
+      </div>
+      <div class="rd__info" id="wk-info" aria-live="polite">
+        <h3>{w0t.title}</h3>
+        <p class="rd__meta">{w0t.client} · {t.work.filters[w0.type]} · {w0.year}</p>
+        <p>{w0t.body}</p>
+      </div>
+    </div>
+    <ol class="rd__list" id="wk-list">
+      {WORK.map((w, i) => {
+        const it = t.work.items[w.id];
+        const st = i === 0 ? t.work.onair : i === 1 ? t.work.next : "";
+        return (
+          <li><button type="button" class="rd__row" data-id={w.id} aria-current={i === 0 ? "true" : "false"}>
+            <span class="rd__pg">A{String(i + 1).padStart(2, "0")}</span>
+            <span class="rd__slug">{it.title}</span>
+            <span class="rd__type">{t.work.filters[w.type]}{w.sample ? " · " + t.work.sample : ""}</span>
+            <span class="rd__st" hidden={!st}>{st}</span>
+          </button></li>
+        );
+      })}
+    </ol>
+  </div>
+  <p class="rd__note" data-i18n="work.note">{t.work.note}</p>
+</section>
+
+<!-- SERVICIOS -->
+<section class="services band" id="servicios" aria-labelledby="sv-title">
+  <div class="head">
+    <h2 class="h2" id="sv-title" data-i18n="services.title">{t.services.title}</h2>
+    <p class="head__intro" data-i18n="services.intro">{t.services.intro}</p>
+  </div>
+  <ul class="acc" id="services-list">
+    {t.services.items.map((s, i) => (
+      <li>
+        <h3><button class="acc__btn" type="button" id={`acc-b${i}`} aria-expanded="false" aria-controls={`acc-p${i}`}>
+          <span class="acc__title">{s.title}</span><span class="acc__tag">{s.tag}</span>
+          <span class="acc__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button></h3>
+        <div class="acc__panel" id={`acc-p${i}`} role="region" aria-labelledby={`acc-b${i}`} data-open="false" inert><div>
+          <div class="acc__inner"><p>{s.body}</p><div class="acc__kw">{s.kw.map((k) => <span>{k}</span>)}</div></div>
+        </div></div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<!-- MANIFIESTO -->
+<section class="manifesto band" aria-labelledby="mf-title">
+  <h2 class="sr" id="mf-title" data-i18n="manifesto.label">{t.manifesto.label}</h2>
+  <p class="manifesto__text" data-i18n-html="manifesto.text" set:html={rich(t.manifesto.text)} />
+  <p class="manifesto__body" data-i18n="manifesto.body">{t.manifesto.body}</p>
+</section>
+
+<!-- HERRAMIENTAS: multiviewer -->
+<section class="tools band" id="herramientas" aria-labelledby="tl-title">
+  <div class="head">
+    <h2 class="h2" id="tl-title" data-i18n="tools.title">{t.tools.title}</h2>
+    <p class="head__intro" data-i18n="tools.intro">{t.tools.intro}</p>
+  </div>
+  <div class="mv" id="mv" role="group" aria-labelledby="tl-title">
+    {t.tools.items.map((o, i) => (
+      <button class="tile" type="button" data-i={i} aria-pressed={i === 0 ? "true" : "false"} aria-controls="mv-detail">
+        <span class="tile__meter" aria-hidden="true"><i></i><i></i></span>
+        <span class="tile__screen"><span class="tile__name">{o.name}</span></span>
+        <span class="tile__umd"><span>CH{i + 1}</span><span class="tile__tally">{i === 0 ? t.tools.onAir : o.tag}</span></span>
+      </button>
+    ))}
+  </div>
+  <div class="mv__detail" id="mv-detail" aria-live="polite">
+    <h3>{t.tools.items[0].name}</h3><p>{t.tools.items[0].body}</p><p class="mv__hint">{t.tools.hint}</p>
+  </div>
+</section>
+
+<!-- MOTOR: grafo de nodos -->
+<section class="engine band" id="motor" aria-labelledby="en-title">
+  <div class="head">
+    <h2 class="h2" id="en-title" data-i18n="engine.title">{t.engine.title}</h2>
+    <p class="head__intro" data-i18n="engine.body">{t.engine.body}</p>
+  </div>
+  <div class="graph" id="graph" role="group" aria-labelledby="en-title">
+    <div class="graph__bar">
+      <p class="graph__status" id="graph-status" aria-live="polite">{t.engine.ok}</p>
+      <div class="graph__btns">
+        <button type="button" class="gbtn gbtn--main" id="graph-solve" data-i18n="engine.solve">{t.engine.solve}</button>
+        <button type="button" class="gbtn" id="graph-shuffle" data-i18n="engine.shuffle">{t.engine.shuffle}</button>
+      </div>
+    </div>
+    <div class="graph__area" id="graph-area">
+      <svg class="graph__wires" id="wires" aria-hidden="true"></svg>
+      <div class="graph__nodes" id="nodes"></div>
+    </div>
+    <p class="graph__hint" data-i18n="engine.hint">{t.engine.hint}</p>
+  </div>
+  <div class="rig">
+    <h3 class="rig__title" data-i18n="engine.hw">{t.engine.hw}</h3>
+    <ul class="rig__list" id="rig">{t.engine.rig.map((r) => <li><b>{r[0]}</b> {r[1]}</li>)}</ul>
+  </div>
+</section>
+
+<!-- PROCESO: línea de tiempo -->
+<section class="process band" id="proceso" aria-labelledby="pr-title">
+  <div class="head">
+    <h2 class="h2" id="pr-title" data-i18n="process.title">{t.process.title}</h2>
+  </div>
+  <div class="tl__bar">
+    <p class="tl__status" id="tl-status" aria-live="polite">{t.process.ok}</p>
+    <button type="button" class="tl__fix" id="tl-fix" data-i18n="process.fix" hidden>{t.process.fix}</button>
+  </div>
+  <div class="tl" id="tl">
+    <div class="tl__ruler" id="ruler" aria-hidden="true"></div>
+    <div class="tl__track tl__track--v"><span class="tl__lbl" aria-hidden="true">V1</span><div class="tl__clips" id="clips" role="group" aria-label="V1"></div></div>
+    <div class="tl__track tl__track--a" aria-hidden="true"><span class="tl__lbl">A1</span><div class="tl__wave" id="wave"></div></div>
+  </div>
+  <p class="tl__hint" data-i18n="process.hint">{t.process.hint}</p>
+  <ol class="steps" id="steps">
+    {t.process.steps.map((p, i) => <li><time>{stepTc[i]}</time><h3>{p.title}</h3><p>{p.body}</p></li>)}
+  </ol>
+</section>
+
+<!-- EQUIPO: credenciales -->
+<section class="team band" id="equipo" aria-labelledby="tm-title">
+  <div class="head">
+    <h2 class="h2" id="tm-title" data-i18n="team.title">{t.team.title}</h2>
+    <p class="head__intro" data-i18n="team.intro">{t.team.intro}</p>
+  </div>
+  <ul class="passes" id="passes">
+    {TEAM.map((p, i) => (
+      <li class="pass" style={`--rot:${ROT[i % ROT.length]}deg`}>
+        <div class="pass__access"><span>IA BROS</span></div>
+        <div class={"pass__photo" + (p.img ? " pass__photo--img" : "")} style={p.eyes ? `--ey:${p.eyes[0]}%;--eh:${p.eyes[1]}%` : undefined}>
+          {p.img ? <img class="pass__img" src={B + p.img} width="400" height="400" alt={p.name} /> : t.team.photo}
+        </div>
+        <div>
+          <h3 class="pass__name">{p.first} {p.nick && <span class="pass__nick">“{p.nick}”</span>} {p.last}</h3>
+          <p class="pass__role">{t.team.roles[i]}</p>
+        </div>
+        <div class="pass__links">
+          <a class="pass__in" href={p.url} target="_blank" rel="noopener">LinkedIn<span class="sr"> · {p.name}</span></a>
+          {p.behance && <a class="pass__in" href={p.behance} target="_blank" rel="noopener">Behance<span class="sr"> · {p.name}</span></a>}
+        </div>
+        <div class="pass__bar" aria-hidden="true"></div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<!-- CONTACTO -->
+<section class="contact band" id="contacto" aria-labelledby="ct-title">
+  <h2 class="contact__title" id="ct-title" data-i18n="contact.title">{t.contact.title}</h2>
+  <div class="contact__row">
+    <p class="contact__body" data-i18n="contact.body">{t.contact.body}</p>
+    <div class="contact__links">
+      <a class="btn btn--ink btn--xl" href="mailto:hola@iabros.cl">hola@iabros.cl</a>
+      <a class="btn btn--line btn--xl" href="https://wa.me/56900000000">WhatsApp +56 9 0000 0000</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <span>IA BROS</span>
+  <span data-i18n="footer.city">{t.footer.city}</span>
+  <span class="foot__tc" id="tc" aria-hidden="true">10:00:00:00</span>
+</footer>

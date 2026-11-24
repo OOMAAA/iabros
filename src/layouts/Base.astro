@@ -1,0 +1,125 @@
+---
+/* <head> con todo el SEO: título, descripción, canonical, idiomas alternos (hreflang),
+   tarjetas para compartir (Open Graph / X), datos estructurados para Google y tipografías. */
+import "../styles/tokens.css";
+import "../styles/base.css";
+import "../styles/components.css";
+import "../styles/sections.css";
+import { I18N, TEAM, LOCALES, V } from "../lib/data.mjs";
+
+const { lang } = Astro.props;
+const t = I18N[lang];
+const loc = LOCALES.find((l) => l.code === lang);
+const B = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+const site = (Astro.site ? Astro.site.href : "https://iabros.cl/").replace(/\/$/, "");
+const abs = (p) => site + B + p;
+const url = abs(loc.path);
+const ogImage = abs(`og/og-${loc.file}.png`);
+const isZh = lang.startsWith("zh");
+
+const fonts =
+  "https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600" +
+  (isZh ? "&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900" : "") +
+  "&display=swap";
+
+const jsonld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": site + B + "#org",
+      name: "IA Bros",
+      url: site + B,
+      logo: abs("assets/icon-512.png"),
+      description: t.meta.description,
+      areaServed: "Worldwide",
+      address: { "@type": "PostalAddress", addressLocality: "Santiago", addressCountry: "CL" },
+      knowsAbout: ["Generative AI", "ComfyUI", "Broadcast graphics", "Vizrt", "Motion graphics", "VFX", "Real-time 3D", "Virtual sets", "Unreal Engine", "Blender", "Automation"],
+      member: TEAM.map((p, i) => ({
+        "@type": "Person",
+        name: p.name,
+        jobTitle: t.team.roles[i],
+        sameAs: [p.url, p.behance].filter(Boolean)
+      }))
+    },
+    {
+      "@type": "WebSite",
+      "@id": site + B + "#web",
+      url: site + B,
+      name: "IA Bros",
+      inLanguage: LOCALES.map((l) => l.code),
+      publisher: { "@id": site + B + "#org" }
+    },
+    {
+      "@type": "WebPage",
+      url,
+      name: t.meta.title,
+      description: t.meta.description,
+      inLanguage: lang,
+      isPartOf: { "@id": site + B + "#web" }
+    }
+  ]
+};
+---
+<!DOCTYPE html>
+<html lang={lang} data-color-mode="random" data-base={B}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{t.meta.title}</title>
+<meta name="description" content={t.meta.description}>
+<link rel="canonical" href={url}>
+{LOCALES.map((l) => <link rel="alternate" hreflang={l.code} href={abs(l.path)}>)}
+<link rel="alternate" hreflang="x-default" href={abs("")}>
+<meta name="theme-color" content="#64FF28">
+<meta name="robots" content="index, follow, max-image-preview:large">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IA Bros">
+<meta property="og:title" content={t.meta.title}>
+<meta property="og:description" content={t.meta.description}>
+<meta property="og:url" content={url}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content={t.meta.title}>
+<meta property="og:locale" content={loc.og}>
+{LOCALES.filter((l) => l.code !== lang).map((l) => <meta property="og:locale:alternate" content={l.og}>)}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={t.meta.title}>
+<meta name="twitter:description" content={t.meta.description}>
+<meta name="twitter:image" content={ogImage}>
+
+<link rel="icon" href={B + "assets/favicon.svg"} type="image/svg+xml">
+<link rel="icon" href={B + "favicon.ico"} sizes="32x32">
+<link rel="apple-touch-icon" href={B + "assets/apple-touch-icon.png"}>
+<link rel="manifest" href={B + "site.webmanifest"}>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href={fonts}>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+<script is:inline define:vars={{ B }}>window.IABROS_BASE = B;</script>
+</head>
+<body>
+<slot />
+<!-- textos del idioma de esta página + datos -->
+<script is:inline src={`${B}i18n/${loc.file}.js?v=${V}`}></script>
+<script is:inline src={`${B}data/team.js?v=${V}`}></script>
+<script is:inline src={`${B}data/stack.js?v=${V}`}></script>
+<script is:inline src={`${B}data/work.js?v=${V}`}></script>
+<!-- lógica (orden importa) -->
+<script is:inline src={`${B}js/i18n.js?v=${V}`}></script>
+<script is:inline src={`${B}js/denoise.js?v=${V}`}></script>
+<script is:inline src={`${B}js/sections.js?v=${V}`}></script>
+<script is:inline src={`${B}js/graph.js?v=${V}`}></script>
+<script is:inline src={`${B}js/faces.js?v=${V}`}></script>
+<script is:inline src={`${B}js/float.js?v=${V}`}></script>
+<script is:inline src={`${B}js/timeline.js?v=${V}`}></script>
+<script is:inline src={`${B}js/work.js?v=${V}`}></script>
+<script is:inline src={`${B}js/theme.js?v=${V}`}></script>
+<script is:inline src={`${B}js/main.js?v=${V}`}></script>
+<script is:inline src={`${B}js/trail.js?v=${V}`}></script>
+</body>
+</html>
