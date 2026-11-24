@@ -9,7 +9,8 @@
   align-content: space-between;
 }
 .hero > * { width: 100%; max-width: 1440px; margin-inline: auto; }
-.hero__kicker { font-weight: 500; }
+/* el H1 (para Google) es esta bajada con las palabras clave; el slogan grande es un <p> */
+.hero__kicker { font: 500 1rem/1.5 var(--f-body); }
 .hero__stage { position: relative; height: clamp(150px, 27vw, 440px); }
 .hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; cursor: crosshair; }
 .hero__meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: -8px; }
