@@ -6,7 +6,7 @@
     "es":      "#64FF28", /* verde */
     "en":      "#00F0FF", /* cian */
     "zh-Hans": "#FF2BD6", /* magenta */
-    "zh-Hant": "#FFF200"  /* amarillo */
+    "zh-Hant": "#E6FF00"  /* amarillo limón flúor */
   };
   var COLORS = Object.keys(PALETTE).map(function (k) { return PALETTE[k]; });
   var root = document.documentElement;
@@ -47,7 +47,10 @@
   }
 
   /* ---------- modo random con glitch ---------- */
-  set(PALETTE.es, true);
+  /* prueba: index.html#limon (o #verde, #cian, #magenta) parte con ese color */
+  var PICK = { verde: "es", cian: "en", magenta: "zh-Hans", limon: "zh-Hant" };
+  var start = PICK[(location.hash || "").slice(1)];
+  set(PALETTE[start] || PALETTE.es, true);
 
   var cv = document.createElement("canvas");
   cv.className = "glitch";
