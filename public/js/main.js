@@ -33,7 +33,7 @@
   window.matchMedia("(min-width: 1081px)").addEventListener("change", function (e) { if (e.matches) setMenu(false); });
 
   /* 3. hero */
-  window.Denoise.init($("#denoise"), { step: $("#dn-step"), seed: $("#dn-seed") });
+  window.Denoise.init($("#denoise"), { step: $("#dn-step"), seed: $("#dn-seed"), font: $("#dn-font") });
   $("#regen").addEventListener("click", function () { window.Denoise.regen(); });
 
   /* 4. timecode del footer (25 fps) */

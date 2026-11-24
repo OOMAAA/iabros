@@ -2,6 +2,25 @@
    El cursor (o el dedo) vuelve a meter ruido donde pasa, y se cura solo. */
 (function () {
   var TEXT = "IA BROS";
+  /* cada "Regenerar" elige otra tipografía (cargadas solo con las letras IA BROS, ver Base.astro) */
+  var FONTS = [
+    { name: "Anybody", fam: "Anybody", w: 900, stretch: "extra-expanded" },
+    { name: "Rubik Mono One", fam: "Rubik Mono One", w: 400 },
+    { name: "Bungee", fam: "Bungee", w: 400 },
+    { name: "Archivo Black", fam: "Archivo Black", w: 400 },
+    { name: "Black Ops One", fam: "Black Ops One", w: 400 },
+    { name: "Unbounded", fam: "Unbounded", w: 900 },
+    { name: "Orbitron", fam: "Orbitron", w: 900 },
+    { name: "Bebas Neue", fam: "Bebas Neue", w: 400 },
+    { name: "Silkscreen", fam: "Silkscreen", w: 700 },
+    { name: "Climate Crisis", fam: "Climate Crisis", w: 400 },
+    { name: "Tilt Warp", fam: "Tilt Warp", w: 400 },
+    { name: "Russo One", fam: "Russo One", w: 400 },
+    { name: "Syncopate", fam: "Syncopate", w: 700 },
+    { name: "Michroma", fam: "Michroma", w: 400 }
+  ];
+  var font = FONTS[0], fontEl;
+  function fontStr(f, px) { return f.w + " " + px + "px \"" + f.fam + "\", sans-serif"; }
   var STEPS = 24;
   var DUR = 2400;
   var INK = [11, 11, 10];
@@ -19,18 +38,20 @@
     var t = document.createElement("canvas");
     t.width = cols; t.height = rows;
     var c = t.getContext("2d");
-    if ("fontStretch" in c) c.fontStretch = "extra-expanded";
-    c.font = "900 100px Anybody, sans-serif";
+    if ("fontStretch" in c) c.fontStretch = font.stretch || "normal";
+    c.font = fontStr(font, 100);
     var m = c.measureText(TEXT);
     var size = 100 * (cols * 0.995) / m.width;
     var capH = (m.actualBoundingBoxAscent || 72) / 100;
     size = Math.min(size, (rows * 0.98) / capH);
-    c.font = "900 " + size + "px Anybody, sans-serif";
+    c.font = fontStr(font, size);
     m = c.measureText(TEXT);
     var asc = m.actualBoundingBoxAscent || size * 0.72;
     var y = Math.round((rows + asc) / 2);
     c.fillStyle = "#000";
-    c.fillText(TEXT, -(m.actualBoundingBoxLeft || 0), y);
+    /* si la fuente es angosta y la limita el alto, se centra en el ancho */
+    var tw = (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || m.width);
+    c.fillText(TEXT, Math.max(0, (cols - tw) / 2) + (m.actualBoundingBoxLeft || 0), y);
     var a = c.getImageData(0, 0, cols, rows).data;
     target = new Float32Array(cols * rows);
     for (var i = 0; i < target.length; i++) target[i] = a[i * 4 + 3] > 110 ? 1 : 0;
@@ -96,6 +117,19 @@
   }
   function kick() { if (!raf) raf = requestAnimationFrame(loop); }
 
+  /* elige otra fuente al azar, la carga y vuelve a generar */
+  function regenNew() {
+    var pool = FONTS.filter(function (f) { return f !== font; });
+    var next = pool[Math.floor(Math.random() * pool.length)];
+    var load = document.fonts && document.fonts.load ? document.fonts.load(fontStr(next, 100), TEXT) : Promise.resolve();
+    Promise.race([load, new Promise(function (r) { setTimeout(r, 1200); })]).then(function () {
+      font = next;
+      if (fontEl) fontEl.textContent = font.name;
+      if (cols) buildTarget();
+      regen();
+    });
+  }
+
   function regen() {
     if (seedEl) seedEl.textContent = pad(Math.floor(Math.random() * 10000), 4);
     start = performance.now();
@@ -127,6 +161,7 @@
     sctx = small.getContext("2d");
     stepEl = readout && readout.step;
     seedEl = readout && readout.seed;
+    fontEl = readout && readout.font;
     var go = function () { layout(); regen(); };
     var ready = document.fonts && document.fonts.load ? document.fonts.load("900 100px Anybody") : Promise.resolve();
     Promise.race([ready, new Promise(function (r) { setTimeout(r, 1500); })]).then(go, go);
@@ -137,5 +172,5 @@
     cv.addEventListener("pointermove", onPointer);
   }
 
-  window.Denoise = { init: init, regen: regen };
+  window.Denoise = { init: init, regen: regenNew };
 })();
