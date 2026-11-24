@@ -27,4 +27,4 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 export const rich = (s) => esc(s).replace(/\[\[(.+?)\]\]/g, "<mark>$1</mark>").replace(/~~(.+?)~~/g, "<s>$1</s>");
 
 /* versión para romper caché de los scripts de public/ */
-export const V = "2611a";
+export const V = "2611b";
